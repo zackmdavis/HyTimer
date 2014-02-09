@@ -7,11 +7,12 @@
     (fn [self initial]
       (.__init__ tkinter.Tk self)
       (self.title "HyTimer")
+      (setv self.initial initial)
       (setv self.remaining initial)
       (setv self.remaining_label (tkinter.StringVar))
       (.set self.remaining_label (self.format_seconds self.remaining))
       (setv self.running False)
-      (setv self.update_period 150) 
+      (setv self.update_period 100) 
       (setv self.display (kwapply (.Label tkinter self)
                                   {"textvariable" self.remaining_label
                                    "font" ["Helvetica" 22]}))
@@ -22,9 +23,12 @@
                                       {"text" "STOP"
                                        "command" self.stop
                                        "state" tkinter.DISABLED}))
-      (.pack self.display)
-      (.pack self.start_button)
-      (.pack self.stop_button)
+      (setv self.reset_button (kwapply (.Button tkinter self)
+                                       {"text" "RESET"
+                                        "command" self.reset}))
+      (for [widget [self.display self.start_button
+                    self.stop_button self.reset_button]]
+        (.pack widget))
       (.mainloop self))]
 
    [start
@@ -44,6 +48,12 @@
                {"state" tkinter.NORMAL})
       (kwapply (.configure self.stop_button)
                {"state" tkinter.DISABLED}))]
+
+   [reset
+    (fn [self]
+      (setv self.remaining self.initial)
+      (setv self.last_updated (.time time))
+      (.set self.remaining_label (self.format_seconds self.remaining)))]
 
     [format_seconds
      (with-decorator staticmethod
