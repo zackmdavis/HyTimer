@@ -1,4 +1,5 @@
 (import tkinter)
+(import tkinter.messagebox)
 (import time)
 (import math)
 
@@ -93,7 +94,15 @@
        (setv self.remaining (- self.remaining elapsed))
        (.set self.remaining_label (self.format_seconds self.remaining))
        (if self.running
-         (.after self self.update_period self.update)))]
+         (if (<= self.remaining 0)
+           (.chime self)
+           (.after self self.update_period self.update))))]
+
+     [chime
+      (fn [self]
+        (.stop self)
+        (.set self.remaining_label "time")
+        (.showinfo tkinter.messagebox "!" "And time!"))]
 
     [edit_initial
      (fn [self]
