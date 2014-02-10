@@ -26,9 +26,13 @@
       (setv self.reset_button (kwapply (.Button tkinter self)
                                        {"text" "RESET"
                                         "command" self.reset}))
-      (for [widget [self.display self.start_button
-                    self.stop_button self.reset_button]]
-        (.pack widget))
+      (kwapply (.grid self.display) {"row" 0})
+
+      (for [index&button (enumerate [self.start_button
+                                     self.stop_button
+                                     self.reset_button])]
+        (kwapply (.grid (second index&button))
+                        {"row" (+ 1 (first index&button))}))
       (.mainloop self))]
 
    [start
