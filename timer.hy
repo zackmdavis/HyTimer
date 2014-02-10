@@ -13,9 +13,28 @@
       (.set self.remaining_label (self.format_seconds self.remaining))
       (setv self.running False)
       (setv self.update_period 100) 
+
       (setv self.display (kwapply (.Label tkinter self)
                                   {"textvariable" self.remaining_label
                                    "font" ["Helvetica" 22]}))
+      (kwapply (.grid self.display) {"row" 0})
+      (.bind self.display "<Double-Button-1>"
+             (fn [event]
+               (self.edit_initial)))
+
+      (setv self.initial_text (.StringVar tkinter))
+      (.set self.initial_text (self.format_seconds self.initial))
+      (setv self.initial_field
+            (kwapply (.Entry tkinter self)
+                     {"textvariable" self.initial_text
+                      "font" ["Helvetica" 22]
+                      "width" 8}))
+      (kwapply (.grid self.initial_field) {"row" 0})
+      (.grid_remove self.initial_field)
+      (.bind self.initial_field "<Return>"
+             (fn [event]
+               (self.save_initial)))
+
       (setv self.start_button (kwapply (.Button tkinter self)
                                        {"text" "START"
                                         "command" self.start}))
@@ -26,13 +45,12 @@
       (setv self.reset_button (kwapply (.Button tkinter self)
                                        {"text" "RESET"
                                         "command" self.reset}))
-      (kwapply (.grid self.display) {"row" 0})
-
       (for [index&button (enumerate [self.start_button
                                      self.stop_button
                                      self.reset_button])]
         (kwapply (.grid (second index&button))
                         {"row" (+ 1 (first index&button))}))
+
       (.mainloop self))]
 
    [start
@@ -76,6 +94,19 @@
        (.set self.remaining_label (self.format_seconds self.remaining))
        (if self.running
          (.after self self.update_period self.update)))]
+
+    [edit_initial
+     (fn [self]
+       (.grid self.initial_field)
+       (.focus_set self.initial_field)
+       (.grid_remove self.display))]
+
+    [save_initial
+     (fn [self]
+       (.grid self.display)
+       (.grid_remove self.initial_field)
+       ;; TODO: actually set initial time
+       )]
 
 ])
 
