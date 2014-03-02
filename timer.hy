@@ -1,7 +1,10 @@
+(import math)
+(import time)
+(import re)
+(import functools)
+
 (import tkinter)
 (import tkinter.messagebox)
-(import time)
-(import math)
 
 (defclass HyTimerWindow [tkinter.Tk]
   [[__init__
@@ -11,7 +14,7 @@
       (setv self.initial initial)
       (setv self.remaining initial)
       (setv self.remaining_label (tkinter.StringVar))
-      (.set self.remaining_label (self.format_seconds self.remaining))
+      (.set self.remaining_label (self.format_from_seconds self.remaining))
       (setv self.running False)
       (setv self.update_period 100) 
 
@@ -24,7 +27,7 @@
                (self.edit_initial)))
 
       (setv self.initial_text (.StringVar tkinter))
-      (.set self.initial_text (self.format_seconds self.initial))
+      (.set self.initial_text (self.format_from_seconds self.initial))
       (setv self.initial_field
             (kwapply (.Entry tkinter self)
                      {"textvariable" self.initial_text
@@ -76,9 +79,9 @@
     (fn [self]
       (setv self.remaining self.initial)
       (setv self.last_updated (.time time))
-      (.set self.remaining_label (self.format_seconds self.remaining)))]
+      (.set self.remaining_label (self.format_from_seconds self.remaining)))]
 
-    [format_seconds
+    [format_from_seconds
      (with-decorator staticmethod
        (fn [seconds]
          (.format "{}:{:02}:{:04.1f}" 
@@ -86,13 +89,32 @@
                   (% (math.floor (/ seconds 60)) 60)
                   (% seconds 60))))]
 
+    [unformat_to_seconds
+     (with-decorator staticmethod
+       (fn [s&m&h]
+         (functools.reduce (fn [x y] (+ x y))
+                           (map (fn [power&figure]
+                                  (* (** 60 (first power&figure))
+                                     (second power&figure)))
+                                (enumerate s&m&h))
+                           0)))]
+
+    [parse
+     (fn [self formatted]
+       (setv time_regex (.compile re "(\d+):?(\d{2}):(\d{2})"))
+       (setv s&m&h (map (fn [x] (if (empty? x) 0 (int x)))
+                        (.group (.match time_regex formatted)
+                                3 2 1)))
+       (self.unformat_to_seconds s&m&h))]
+
     [update
      (fn [self]
        (setv now (.time time))
        (setv elapsed (- now self.last_updated))
        (setv self.last_updated now)
        (setv self.remaining (- self.remaining elapsed))
-       (.set self.remaining_label (self.format_seconds self.remaining))
+       (.set self.remaining_label (self.format_from_seconds
+                                   self.remaining))
        (if self.running
          (if (<= self.remaining 0)
            (.chime self)
@@ -114,7 +136,12 @@
      (fn [self]
        (.grid self.display)
        (.grid_remove self.initial_field)
-       ;; TODO: actually set initial time
+       (try
+         (do
+           (setv self.initial (self.parse (.get self.initial_text)))
+           (self.reset))
+         (catch [e Exception]
+             (print e)))
        )]
 
 ])
