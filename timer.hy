@@ -18,10 +18,10 @@
       (setv self.running False)
       (setv self.update_period 100) 
 
-      (setv self.display (kwapply (.Label tkinter self)
-                                  {"textvariable" self.remaining_label
-                                   "font" ["Helvetica" 22]}))
-      (kwapply (.grid self.display) {"row" 0})
+      (setv self.display (apply tkinter.Label [self]
+                                {"textvariable" self.remaining_label
+                                 "font" ["Helvetica" 22]}))
+      (apply self.display.grid [] {"row" 0})
       (.bind self.display "<Double-Button-1>"
              (fn [event]
                (self.edit_initial)))
@@ -29,31 +29,31 @@
       (setv self.initial_text (.StringVar tkinter))
       (.set self.initial_text (self.format_from_seconds self.initial))
       (setv self.initial_field
-            (kwapply (.Entry tkinter self)
-                     {"textvariable" self.initial_text
-                      "font" ["Helvetica" 22]
-                      "width" 8}))
-      (kwapply (.grid self.initial_field) {"row" 0})
+            (apply tkinter.Entry [self]
+                   {"textvariable" self.initial_text
+                    "font" ["Helvetica" 22]
+                    "width" 8}))
+      (apply self.initial_field.grid [] {"row" 0})
       (.grid_remove self.initial_field)
       (.bind self.initial_field "<Return>"
              (fn [event]
                (self.save_initial)))
 
-      (setv self.start_button (kwapply (.Button tkinter self)
+      (setv self.start_button (apply tkinter.Button [self]
                                        {"text" "START"
                                         "command" self.start}))
-      (setv self.stop_button (kwapply (.Button tkinter self)
+      (setv self.stop_button (apply tkinter.Button [self]
                                       {"text" "STOP"
                                        "command" self.stop
                                        "state" tkinter.DISABLED}))
-      (setv self.reset_button (kwapply (.Button tkinter self)
+      (setv self.reset_button (apply tkinter.Button [self]
                                        {"text" "RESET"
                                         "command" self.reset}))
       (for [index&button (enumerate [self.start_button
                                      self.stop_button
                                      self.reset_button])]
-        (kwapply (.grid (second index&button))
-                        {"row" (+ 1 (first index&button))}))
+        (apply .grid [(second index&button)]
+                     {"row" (+ 1 (first index&button))}))
 
       (.mainloop self))]
 
@@ -62,17 +62,17 @@
       (setv self.running True)
       (setv self.last_updated (.time time))
       (.update self)
-      (kwapply (.configure self.stop_button)
+      (apply self.stop_button.configure []
                {"state" tkinter.NORMAL})
-      (kwapply (.configure self.start_button)
+      (apply self.start_button.configure []
                {"state" tkinter.DISABLED}))]
 
    [stop
     (fn [self]
       (setv self.running False)
-      (kwapply (.configure self.start_button)
+      (apply self.start_button.configure []
                {"state" tkinter.NORMAL})
-      (kwapply (.configure self.stop_button)
+      (apply self.stop_button.configure []
                {"state" tkinter.DISABLED}))]
 
    [reset
