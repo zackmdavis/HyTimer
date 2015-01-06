@@ -6,6 +6,8 @@
 (import tkinter)
 (import tkinter.messagebox)
 
+(require macro-library)
+
 (defclass HyTimerWindow [tkinter.Tk]
   [[--init--
     (fn [self initial]
@@ -82,7 +84,7 @@
       (.set self.remaining-label (self.format-from-seconds self.remaining)))]
 
     [format-from-seconds
-     (with-decorator staticmethod
+     (@ staticmethod
        (fn [seconds]
          (.format "{}:{:02}:{:04.1f}"
                   (math.floor (/ seconds 3600))
@@ -90,7 +92,7 @@
                   (% seconds 60))))]
 
     [unformat-to-seconds
-     (with-decorator staticmethod
+     (@ staticmethod
        (fn [s&m&h]
          (functools.reduce (fn [x y] (+ x y))
                            (map (fn [power&figure]
