@@ -7,51 +7,51 @@
 (import tkinter.messagebox)
 
 (defclass HyTimerWindow [tkinter.Tk]
-  [[__init__
+  [[--init--
     (fn [self initial]
-      (.__init__ tkinter.Tk self)
+      (.--init-- tkinter.Tk self)
       (self.title "HyTimer")
       (setv self.initial initial)
       (setv self.remaining initial)
-      (setv self.remaining_label (tkinter.StringVar))
-      (.set self.remaining_label (self.format_from_seconds self.remaining))
-      (setv self.running False)
-      (setv self.update_period 100) 
+      (setv self.remaining-label (tkinter.StringVar))
+      (.set self.remaining-label (self.format-from-seconds self.remaining))
+      (setv self.running false)
+      (setv self.update-period 100)
 
       (setv self.display (apply tkinter.Label [self]
-                                {"textvariable" self.remaining_label
+                                {"textvariable" self.remaining-label
                                  "font" ["Helvetica" 22]}))
       (apply self.display.grid [] {"row" 0})
       (.bind self.display "<Double-Button-1>"
              (fn [event]
-               (self.edit_initial)))
+               (self.edit-initial)))
 
-      (setv self.initial_text (.StringVar tkinter))
-      (.set self.initial_text (self.format_from_seconds self.initial))
-      (setv self.initial_field
+      (setv self.initial-text (.StringVar tkinter))
+      (.set self.initial-text (self.format-from-seconds self.initial))
+      (setv self.initial-field
             (apply tkinter.Entry [self]
-                   {"textvariable" self.initial_text
+                   {"textvariable" self.initial-text
                     "font" ["Helvetica" 22]
                     "width" 8}))
-      (apply self.initial_field.grid [] {"row" 0})
-      (.grid_remove self.initial_field)
-      (.bind self.initial_field "<Return>"
+      (apply self.initial-field.grid [] {"row" 0})
+      (.grid-remove self.initial-field)
+      (.bind self.initial-field "<Return>"
              (fn [event]
-               (self.save_initial)))
+               (self.save-initial)))
 
-      (setv self.start_button (apply tkinter.Button [self]
+      (setv self.start-button (apply tkinter.Button [self]
                                        {"text" "START"
                                         "command" self.start}))
-      (setv self.stop_button (apply tkinter.Button [self]
+      (setv self.stop-button (apply tkinter.Button [self]
                                       {"text" "STOP"
                                        "command" self.stop
                                        "state" tkinter.DISABLED}))
-      (setv self.reset_button (apply tkinter.Button [self]
+      (setv self.reset-button (apply tkinter.Button [self]
                                        {"text" "RESET"
                                         "command" self.reset}))
-      (for [index&button (enumerate [self.start_button
-                                     self.stop_button
-                                     self.reset_button])]
+      (for [index&button (enumerate [self.start-button
+                                     self.stop-button
+                                     self.reset-button])]
         (apply .grid [(second index&button)]
                      {"row" (+ 1 (first index&button))}))
 
@@ -59,37 +59,37 @@
 
    [start
     (fn [self]
-      (setv self.running True)
-      (setv self.last_updated (.time time))
+      (setv self.running true)
+      (setv self.last-updated (.time time))
       (.update self)
-      (apply self.stop_button.configure []
+      (apply self.stop-button.configure []
                {"state" tkinter.NORMAL})
-      (apply self.start_button.configure []
+      (apply self.start-button.configure []
                {"state" tkinter.DISABLED}))]
 
    [stop
     (fn [self]
-      (setv self.running False)
-      (apply self.start_button.configure []
+      (setv self.running false)
+      (apply self.start-button.configure []
                {"state" tkinter.NORMAL})
-      (apply self.stop_button.configure []
+      (apply self.stop-button.configure []
                {"state" tkinter.DISABLED}))]
 
    [reset
     (fn [self]
       (setv self.remaining self.initial)
-      (setv self.last_updated (.time time))
-      (.set self.remaining_label (self.format_from_seconds self.remaining)))]
+      (setv self.last-updated (.time time))
+      (.set self.remaining-label (self.format-from-seconds self.remaining)))]
 
-    [format_from_seconds
+    [format-from-seconds
      (with-decorator staticmethod
        (fn [seconds]
-         (.format "{}:{:02}:{:04.1f}" 
+         (.format "{}:{:02}:{:04.1f}"
                   (math.floor (/ seconds 3600))
                   (% (math.floor (/ seconds 60)) 60)
                   (% seconds 60))))]
 
-    [unformat_to_seconds
+    [unformat-to-seconds
      (with-decorator staticmethod
        (fn [s&m&h]
          (functools.reduce (fn [x y] (+ x y))
@@ -101,50 +101,47 @@
 
     [parse
      (fn [self formatted]
-       (setv time_regex (.compile re "(\d+):?(\d{2}):(\d{2})"))
+       (setv time-regex (.compile re "(\d+):?(\d{2}):(\d{2})"))
        (setv s&m&h (map (fn [x] (if (empty? x) 0 (int x)))
-                        (.group (.match time_regex formatted)
+                        (.group (.match time-regex formatted)
                                 3 2 1)))
-       (self.unformat_to_seconds s&m&h))]
+       (self.unformat-to-seconds s&m&h))]
 
     [update
      (fn [self]
        (setv now (.time time))
-       (setv elapsed (- now self.last_updated))
-       (setv self.last_updated now)
+       (setv elapsed (- now self.last-updated))
+       (setv self.last-updated now)
        (setv self.remaining (- self.remaining elapsed))
-       (.set self.remaining_label (self.format_from_seconds
+       (.set self.remaining-label (self.format-from-seconds
                                    self.remaining))
        (if self.running
          (if (<= self.remaining 0)
            (.chime self)
-           (.after self self.update_period self.update))))]
+           (.after self self.update-period self.update))))]
 
      [chime
       (fn [self]
         (.stop self)
-        (.set self.remaining_label "time")
+        (.set self.remaining-label "time")
         (.showinfo tkinter.messagebox "!" "And time!"))]
 
-    [edit_initial
+    [edit-initial
      (fn [self]
-       (.grid self.initial_field)
-       (.focus_set self.initial_field)
-       (.grid_remove self.display))]
+       (.grid self.initial-field)
+       (.focus-set self.initial-field)
+       (.grid-remove self.display))]
 
-    [save_initial
+    [save-initial
      (fn [self]
        (.grid self.display)
-       (.grid_remove self.initial_field)
+       (.grid-remove self.initial-field)
        (try
-         (do
-           (setv self.initial (self.parse (.get self.initial_text)))
-           (self.reset))
-         (catch [e Exception]
-             (print e)))
-       )]
+        (do
+         (setv self.initial (self.parse (.get self.initial-text)))
+         (self.reset))
+        (catch [e Exception]
+          (print e))))]])
 
-])
-
-(if (= __name__ "__main__")
+(if (= --name-- "__main__")
   (HyTimerWindow (* 20 60)))
