@@ -19,10 +19,10 @@
       (setv self.running False)
       (setv self.update-period 100)
 
-      (setv self.display (apply tkinter.Label [self]
-                                {"textvariable" self.remaining-label
-                                 "font" ["Helvetica" 22]}))
-      (apply self.display.grid [] {"row" 0})
+      (setv self.display (tkinter.Label #*[self]
+                                #**{"textvariable" self.remaining-label
+                                    "font" ["Helvetica" 22]}))
+      (self.display.grid #*[] #**{"row" 0})
       (.bind self.display "<Double-Button-1>"
              (fn [event]
                (self.edit-initial)))
@@ -30,31 +30,31 @@
       (setv self.initial-text (.StringVar tkinter))
       (.set self.initial-text (self.format-from-seconds self.initial))
       (setv self.initial-field
-            (apply tkinter.Entry [self]
-                   {"textvariable" self.initial-text
-                    "font" ["Helvetica" 22]
-                    "width" 8}))
-      (apply self.initial-field.grid [] {"row" 0})
+            (tkinter.Entry #*[self]
+                   #**{"textvariable" self.initial-text
+                       "font" ["Helvetica" 22]
+                       "width" 8}))
+      (self.initial-field.grid #*[] #**{"row" 0})
       (.grid-remove self.initial-field)
       (.bind self.initial-field "<Return>"
              (fn [event]
                (self.save-initial)))
 
-      (setv self.start-button (apply tkinter.Button [self]
-                                       {"text" "START"
-                                        "command" self.start}))
-      (setv self.stop-button (apply tkinter.Button [self]
-                                      {"text" "STOP"
-                                       "command" self.stop
-                                       "state" tkinter.DISABLED}))
-      (setv self.reset-button (apply tkinter.Button [self]
-                                       {"text" "RESET"
-                                        "command" self.reset}))
+      (setv self.start-button (tkinter.Button #*[self]
+                                       #**{"text" "START"
+                                           "command" self.start}))
+      (setv self.stop-button (tkinter.Button #*[self]
+                                      #**{"text" "STOP"
+                                          "command" self.stop
+                                          "state" tkinter.DISABLED}))
+      (setv self.reset-button (tkinter.Button #*[self]
+                                       #**{"text" "RESET"
+                                           "command" self.reset}))
       (for [index&button (enumerate [self.start-button
                                      self.stop-button
                                      self.reset-button])]
-        (apply .grid [(second index&button)]
-                     {"row" (+ 1 (first index&button))}))
+        (setv kwargs {"row" (+ 1 (first index&button))})
+        (.grid (second index&button) #** kwargs))
 
       (.mainloop self))
 
@@ -62,17 +62,17 @@
       (setv self.running True)
       (setv self.last-updated (.time time))
       (.update self)
-      (apply self.stop-button.configure []
-               {"state" tkinter.NORMAL})
-      (apply self.start-button.configure []
-               {"state" tkinter.DISABLED}))
+      (self.stop-button.configure
+               #**{"state" tkinter.NORMAL})
+      (self.start-button.configure
+               #**{"state" tkinter.DISABLED}))
 
     (defn stop [self]
       (setv self.running False)
-      (apply self.start-button.configure []
-               {"state" tkinter.NORMAL})
-      (apply self.stop-button.configure []
-               {"state" tkinter.DISABLED}))
+      (self.start-button.configure
+               #**{"state" tkinter.NORMAL})
+      (self.stop-button.configure
+               #**{"state" tkinter.DISABLED}))
 
     (defn reset [self]
       (setv self.remaining self.initial)
