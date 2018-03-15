@@ -6,18 +6,16 @@
 (import tkinter)
 (import tkinter.messagebox)
 
-(require macro-library)
 
 (defclass HyTimerWindow [tkinter.Tk]
-  [[--init--
-    (fn [self initial]
+    (defn --init-- [self initial]
       (.--init-- tkinter.Tk self)
       (self.title "HyTimer")
       (setv self.initial initial)
       (setv self.remaining initial)
       (setv self.remaining-label (tkinter.StringVar))
       (.set self.remaining-label (self.format-from-seconds self.remaining))
-      (setv self.running false)
+      (setv self.running False)
       (setv self.update-period 100)
 
       (setv self.display (apply tkinter.Label [self]
@@ -57,60 +55,51 @@
         (apply .grid [(second index&button)]
                      {"row" (+ 1 (first index&button))}))
 
-      (.mainloop self))]
+      (.mainloop self))
 
-   [start
-    (fn [self]
-      (setv self.running true)
+    (defn start [self]
+      (setv self.running True)
       (setv self.last-updated (.time time))
       (.update self)
       (apply self.stop-button.configure []
                {"state" tkinter.NORMAL})
       (apply self.start-button.configure []
-               {"state" tkinter.DISABLED}))]
+               {"state" tkinter.DISABLED}))
 
-   [stop
-    (fn [self]
-      (setv self.running false)
+    (defn stop [self]
+      (setv self.running False)
       (apply self.start-button.configure []
                {"state" tkinter.NORMAL})
       (apply self.stop-button.configure []
-               {"state" tkinter.DISABLED}))]
+               {"state" tkinter.DISABLED}))
 
-   [reset
-    (fn [self]
+    (defn reset [self]
       (setv self.remaining self.initial)
       (setv self.last-updated (.time time))
-      (.set self.remaining-label (self.format-from-seconds self.remaining)))]
+      (.set self.remaining-label (self.format-from-seconds self.remaining)))
 
-    [format-from-seconds
-     (@ staticmethod
-       (fn [seconds]
-         (.format "{}:{:02}:{:04.1f}"
-                  (math.floor (/ seconds 3600))
-                  (% (math.floor (/ seconds 60)) 60)
-                  (% seconds 60))))]
+    (defn format-from-seconds [self seconds]
+      (.format "{}:{:02}:{:04.1f}"
+               (math.floor (/ seconds 3600))
+               (% (math.floor (/ seconds 60)) 60)
+               (% seconds 60)))
 
-    [unformat-to-seconds
-     (@ staticmethod
-       (fn [s&m&h]
+     (defn unformat-to-seconds [self s&m&h]
          (functools.reduce (fn [x y] (+ x y))
                            (map (fn [power&figure]
                                   (* (** 60 (first power&figure))
                                      (second power&figure)))
                                 (enumerate s&m&h))
-                           0)))]
+                           0))
 
-    [parse
-     (fn [self formatted]
+     (defn parse [self formatted]
        (setv time-regex (.compile re "(\d+):?(\d{2}):(\d{2})"))
        (setv s&m&h (map (fn [x] (if (empty? x) 0 (int x)))
                         (.group (.match time-regex formatted)
                                 3 2 1)))
-       (self.unformat-to-seconds s&m&h))]
+       (self.unformat-to-seconds s&m&h))
 
-    [update
-     (fn [self]
+     (defn update [self]
        (setv now (.time time))
        (setv elapsed (- now self.last-updated))
        (setv self.last-updated now)
@@ -120,30 +109,28 @@
        (if self.running
          (if (<= self.remaining 0)
            (.chime self)
-           (.after self self.update-period self.update))))]
+           (.after self self.update-period self.update))))
 
-     [chime
-      (fn [self]
+     (defn chime [self]
         (.stop self)
         (.set self.remaining-label "time")
-        (.showinfo tkinter.messagebox "!" "And time!"))]
+        (.showinfo tkinter.messagebox "!" "And time!"))
 
-    [edit-initial
-     (fn [self]
+     (defn edit-initial [self]
        (.grid self.initial-field)
        (.focus-set self.initial-field)
-       (.grid-remove self.display))]
+       (.grid-remove self.display))
 
-    [save-initial
-     (fn [self]
+     (defn save-initial [self]
        (.grid self.display)
        (.grid-remove self.initial-field)
        (try
         (do
          (setv self.initial (self.parse (.get self.initial-text)))
          (self.reset))
-        (catch [e Exception]
-          (print e))))]])
+        (except [e Exception]
+          (print e)))))
+
 
 (if (= --name-- "__main__")
   (HyTimerWindow (* 20 60)))
