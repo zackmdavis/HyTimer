@@ -2,6 +2,7 @@
 (import time)
 (import re)
 (import functools)
+(import subprocess)
 
 (import tkinter)
 (import tkinter.messagebox)
@@ -113,8 +114,10 @@
 
      (defn chime [self]
         (.stop self)
-        (.set self.remaining-label "time")
-        (.showinfo tkinter.messagebox "!" "And time!"))
+       (.set self.remaining-label "time")
+       (setv speaker (subprocess.Popen ["espeak" "'and time'"]))
+       (.showinfo tkinter.messagebox "!" "And time!")
+       (.terminate speaker))
 
      (defn edit-initial [self]
        (.grid self.initial-field)
