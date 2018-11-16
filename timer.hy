@@ -1,3 +1,4 @@
+(import datetime)
 (import math)
 (import time)
 (import re)
@@ -116,7 +117,8 @@
         (.stop self)
        (.set self.remaining-label "time")
        (setv speaker (subprocess.Popen ["espeak" "'and time'"]))
-       (.showinfo tkinter.messagebox "!" "And time!")
+       (.showinfo tkinter.messagebox "!" (.format "And time!\n\n{}"
+                                                  (.strftime (.now datetime.datetime) "%H%M")))
        (.terminate speaker))
 
      (defn edit-initial [self]
