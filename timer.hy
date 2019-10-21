@@ -116,6 +116,8 @@
      (defn chime [self]
         (.stop self)
        (.set self.remaining-label "time")
+       (subprocess.run ["xrefresh" "-solid" "black"])
+       (subprocess.run ["notify-send" "And time!"])
        (setv speaker (subprocess.Popen ["espeak" "'and time'"]))
        (.showinfo tkinter.messagebox "!" (.format "And time!\n\n{}"
                                                   (.strftime (.now datetime.datetime) "%H%M")))
